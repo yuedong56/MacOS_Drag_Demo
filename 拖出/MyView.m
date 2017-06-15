@@ -84,9 +84,8 @@
     NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pbItem];
     
     /* 拖放可视化定义, 定义拖放过程中的跟随鼠标移动的图像 */
-    [dragItem setDraggingFrame:NSMakeRect(0, 0, _image.size.width, _image.size.height)
-                      contents:_image];
-    
+    NSImage *image = [self viewCapture];
+    [dragItem setDraggingFrame:NSMakeRect(0, 0, image.size.width, image.size.height) contents:image];
     /* 建立一个拖放的 session */
     NSDraggingSession *draggingSession = [self beginDraggingSessionWithItems:@[dragItem] event:event source:self];
     
@@ -109,6 +108,23 @@
             return NSDragOperationNone;
             break;
     }
+}
+
+//屏幕截图
+- (NSImage *)viewCapture
+{
+//    NSImage *viewImage = [[NSImage alloc] initWithData:[self dataWithPDFInsideRect:self.bounds]];
+//    [self lockFocus];
+//    NSBitmapImageRep *screenRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:self.bounds];
+//    [self unlockFocus];
+//    [viewImage addRepresentation:screenRep];
+//    return viewImage;
+    
+    //上面屏蔽掉的不知道为啥不行
+    NSBitmapImageRep *imageRep = [self bitmapImageRepForCachingDisplayInRect: self.bounds];
+    [self cacheDisplayInRect: self.bounds toBitmapImageRep: imageRep];
+    NSImage *viewImage = [[NSImage alloc] initWithCGImage: [imageRep CGImage] size: self.bounds.size];
+    return viewImage;
 }
 
 #pragma mark -- NSPasteboardItemDataProvider
